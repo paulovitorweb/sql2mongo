@@ -1,0 +1,8 @@
+pytest==7.1.1
+pytest-mock==3.7.0
+requests==2.27.1
+flake8==4.0.1
+pytest_cov==3.0.0
+mongomock==4.0.0
+pymongo==4.1.1
+SQLAlchemy==1.4.35
