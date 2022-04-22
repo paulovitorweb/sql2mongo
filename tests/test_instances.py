@@ -1,5 +1,5 @@
 import pytest
-from src.sql2mongo import Migration, OneToManyIncorporator
+from src.sql2mongo import Migration, OneToManyIncorporator, OneToOneIncorporator
 
 
 def test_migration_instance():
@@ -70,3 +70,18 @@ def test_migration_instance_with_incorporator():
     assert mig.cols == ['Id', 'Name', 'Email']
     assert mig.fields == ['_old_id', 'name', 'email', 'adresses']
     assert mig.query == 'SELECT Id, Name, Email FROM Users'
+
+
+def test_migration_instance_with_not_supported_incorporator():
+    mapping = {
+        'Name': 'name',
+        'Email': 'email',
+        'Adresses': OneToOneIncorporator(
+            source_table='Adresses',
+            fk_col='UserId',
+            field_name='adresses',
+            mapping={'publicArea': 'street'},
+        ),
+    }
+    with pytest.raises(Exception):
+        Migration(mapping, 'Users', 'users', pk_col='Id')

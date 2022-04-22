@@ -4,7 +4,7 @@ from pymongo.collection import Collection
 from src.sql2mongo.incorporator import Incorporator, OneToManyIncorporator
 
 
-Rows = Iterator[dict]
+Documents = Iterator[dict]
 
 
 class Migration:
@@ -30,7 +30,7 @@ class Migration:
         self._source_session = importlib.import_module('tests.conftest').TestingSessionLocal()
         self._database = importlib.import_module('tests.conftest').test_client['to.db']
 
-        self._data: Rows = []
+        self._data: Documents = []
 
     def exec(self) -> None:
         self._exec_query()
@@ -53,9 +53,6 @@ class Migration:
 
     def _exec_incorporations(self) -> None:
         for inc in self._incorporators:
-            if not isinstance(inc, OneToManyIncorporator):
-                raise NotImplementedError('Only one-to-many incorporations are supported')
-
             collection = self._get_collection()
             rows = self._source_session.execute(inc.query)
             if inc._scalar:
@@ -86,7 +83,11 @@ class Migration:
         return [self.pk_field] + [str(f) for f in self.mapping.values()]
 
     def _get_incorporators(self) -> List[Incorporator]:
-        return [v for v in self.mapping.values() if isinstance(v, Incorporator)]
+        incs = [v for v in self.mapping.values() if isinstance(v, Incorporator)]
+        for inc in incs:
+            if not isinstance(inc, OneToManyIncorporator):
+                raise NotImplementedError('Only one-to-many incorporations are supported')
+        return incs
 
     def _get_collection(self) -> Collection:
         return self._database[self.to_collection]

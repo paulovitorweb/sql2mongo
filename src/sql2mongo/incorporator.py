@@ -50,3 +50,7 @@ class OneToManyIncorporator(Incorporator):
                 row,
             )
         )
+
+
+class OneToOneIncorporator(Incorporator):
+    _class = dict
