@@ -1,3 +1,4 @@
+import pytest
 from src.sql2mongo import Migration, OneToManyIncorporator
 
 
@@ -30,6 +31,28 @@ def test_incorporator_instance():
         mapping={'publicArea': 'street'},
     )
     assert inc.query == 'SELECT publicArea, UserId FROM Adresses'
+
+
+def test_incorporator_instance_with_scalar_should_raise_error():
+    with pytest.raises(ValueError):
+        OneToManyIncorporator(
+            'Adresses',
+            fk_col='UserId',
+            mapping={'Description': 'desc'},
+            scalar=True,
+            field_name='adresses',
+        )
+
+
+def test_incorporator_instance_with_scalar_should_succeed():
+    inc = OneToManyIncorporator(
+        'Adresses',
+        fk_col='UserId',
+        mapping='Description',
+        scalar=True,
+        field_name='adresses',
+    )
+    assert inc.query == 'SELECT Description, UserId FROM Adresses'
 
 
 def test_migration_instance_with_incorporator():
