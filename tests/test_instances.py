@@ -83,5 +83,5 @@ def test_migration_instance_with_not_supported_incorporator():
             mapping={'publicArea': 'street'},
         ),
     }
-    with pytest.raises(Exception):
+    with pytest.raises(NotImplementedError):
         Migration(mapping, 'Users', 'users', pk_col='Id')
